@@ -4,6 +4,7 @@
 void Swapchain::run(VulkanInit& vulkan)
 {
 	createSwapChain(vulkan);
+	createImageViews(vulkan);
 }
 
 VNCreatorApp::swapChainSupport Swapchain::querySwapChainSupport(VkPhysicalDevice device, VulkanInit& vulkan)
@@ -79,7 +80,7 @@ void Swapchain::createSwapChain(VulkanInit& vulkan)
 	VkExtent2D extent = swapExtent(swapChainSupport.capabilities);
 
 	// nbr d'images de la swapchain
-	uint32_t imgCount = swapChainSupport.capabilities.minImageCount;
+	uint32_t imgCount = swapChainSupport.capabilities.minImageCount + 1;
 
 	// config de la swapchain
 	VkSwapchainCreateInfoKHR swapchainInfo{};
@@ -94,8 +95,8 @@ void Swapchain::createSwapChain(VulkanInit& vulkan)
 	swapchainInfo.preTransform = swapChainSupport.capabilities.currentTransform;
 	swapchainInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 	swapchainInfo.presentMode = presMode;
-	swapchainInfo.clipped = VK_TRUE; // ?
-	swapchainInfo.oldSwapchain = VK_NULL_HANDLE; // TODO
+	swapchainInfo.clipped = VK_TRUE; // ???
+	swapchainInfo.oldSwapchain = nullptr; // TODO
 
 	VNCreatorApp::queueFamilyIndices familyIndices = vulkan.findQueueFamilies(vulkan.getPhysicalDevice());
 	uint32_t FamilyIndices[2] = {familyIndices.gfxFamily.value(), familyIndices.presFamily.value()};
@@ -103,7 +104,7 @@ void Swapchain::createSwapChain(VulkanInit& vulkan)
 	if (familyIndices.gfxFamily != familyIndices.presFamily)
 	{
 		// les img peuvent être utilisées par différentes queue families
-		swapchainInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT; 
+		swapchainInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
 		swapchainInfo.queueFamilyIndexCount = 2;
 		swapchainInfo.pQueueFamilyIndices = FamilyIndices;
 	}
@@ -127,8 +128,40 @@ void Swapchain::createSwapChain(VulkanInit& vulkan)
 	this->swapChainExtent = extent;
 }
 
+void Swapchain::createImageViews(VulkanInit& vulkan)
+{
+	this->swapChainImg.resize(this->swapChainImg.size());
+
+	for (size_t i = 0; i < this->swapChainImg.size(); i++)
+	{
+		VkImageViewCreateInfo imgViewInfo{};
+		imgViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		imgViewInfo.image = this->swapChainImg[i];
+		imgViewInfo.format = this->swapChainFormat;
+		imgViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		imgViewInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+		imgViewInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+		imgViewInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+		imgViewInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+		imgViewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		imgViewInfo.subresourceRange.baseMipLevel = 0; // ???
+		imgViewInfo.subresourceRange.levelCount = 1;
+		imgViewInfo.subresourceRange.baseArrayLayer = 0;
+		imgViewInfo.subresourceRange.layerCount = 1;
+
+		if (vkCreateImageView(vulkan.getDevice(), &imgViewInfo, nullptr, &this->swapChainImgView[i]) != VK_SUCCESS)
+		{
+			throw std::runtime_error("!!!!!imageView: vkCreateImageView(vulkan.getDevice(), &imgViewInfo, nullptr, &this->swapChainImg[i]) != VK_SUCCESS");
+		}
+	}
+}
+
 // clean
 void Swapchain::clean(VulkanInit& vulkan)
 {
+	for (auto imgView : this->swapChainImgView)
+	{
+		vkDestroyImageView(vulkan.getDevice(), imgView, nullptr);
+	}
 	vkDestroySwapchainKHR(vulkan.getDevice(), this->swapChain, nullptr);
 }

@@ -23,6 +23,7 @@ class Swapchain
 public:
 
 	void createSwapChain(VulkanInit& vulkan);
+	void createImageViews(VulkanInit& vulkan);
 	void run(VulkanInit& vulkan);
 	void clean(VulkanInit& vulkan);
 
@@ -36,6 +37,7 @@ private:
 	const uint32_t HAUTEUR = 600;
 
 	VkSwapchainKHR swapChain;
+	std::vector<VkImageView> swapChainImgView;
 	std::vector<VkImage> swapChainImg;
 	VkFormat swapChainFormat;
 	VkExtent2D swapChainExtent;
