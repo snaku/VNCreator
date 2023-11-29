@@ -1,5 +1,6 @@
-#include "VulkanInit.h"
 #include "Window.h"
+#include "VulkanInit.h"
+#include "SwapChain.h"
 #include "mainLoop.h"
 
 int main()
@@ -8,7 +9,10 @@ int main()
 	{
 		Window window;
 		VulkanInit vulkan(window);
+		Swapchain swapchain;
+		swapchain.run(vulkan);
 		VNCreatorApp::mainLoop(window.getWindow());
+		swapchain.clean(vulkan);
 	}
 	catch(const std::exception& e)
 	{
