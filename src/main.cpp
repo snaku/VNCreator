@@ -1,18 +1,13 @@
-#include "Window.h"
-#include "VulkanInit.h"
-#include "SwapChain.h"
-#include "mainLoop.h"
+#include "VNCreator.h"
+#include <stdexcept>
+#include <iostream>
 
 int main()
 {
 	try
 	{
-		Window window;
-		VulkanInit vulkan(window);
-		Swapchain swapchain;
-		swapchain.run(vulkan);
-		VNCreatorApp::mainLoop(window.getWindow());
-		swapchain.clean(vulkan);
+		VNCreator::loadImage("C:\\Users\\Desktop\\Test img vulkan\\btmc.png");
+		VNCreator::init();
 	}
 	catch(const std::exception& e)
 	{
