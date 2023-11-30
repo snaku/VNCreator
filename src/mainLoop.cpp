@@ -1,6 +1,6 @@
 #include "mainLoop.h"
 
-namespace VNCreatorApp
+namespace mainLoop
 {
 	void mainLoop(GLFWwindow* window)
 	{
