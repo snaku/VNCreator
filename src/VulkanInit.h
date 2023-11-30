@@ -1,5 +1,5 @@
 #pragma once
-#define GLFW_INCLUDE_VULKAN
+#include <vulkan/vulkan.h>
 #include <GLFW/glfw3.h>
 
 #include <iostream>
@@ -39,8 +39,6 @@ namespace VNCreatorApp
 class VulkanInit
 {
 public:
-	VulkanInit(Window& window);
-	~VulkanInit();
 
 	void run(Window& window);
 	void createInstance();
@@ -70,7 +68,7 @@ private:
 		"VK_LAYER_KHRONOS_validation"
 	};
 
-	const std::vector<const char*> deviceExt
+	const std::vector<const char*> deviceExt =
 	{
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};

@@ -1,23 +1,13 @@
 #include "VulkanInit.h"
 
-// constructeur
-VulkanInit::VulkanInit(Window& window)
-{
-	run(window);
-}
-
-//destructeur
-VulkanInit::~VulkanInit()
-{
-	clean();
-}
-
+// A SAVOIR: swapchain.run est appelée ici
 void VulkanInit::run(Window& window)
 {
 	createInstance();
 	createSurface(window);
 	pickPhysicalDevice();
 	createLogicalDevice();
+	swapchain.run(*this);
 }
 
 // instance vulkan
@@ -254,9 +244,10 @@ bool VulkanInit::checkDeviceExt(VkPhysicalDevice device)
 	return reqExt.empty();
 }
 
-// clean
+// clean (A SAVOIR: swapchain.clean est appelée ici)
 void VulkanInit::clean()
 {
+	swapchain.clean(*this);
 	vkDestroySurfaceKHR(this->instance, this->surface, nullptr);
 	vkDestroyDevice(device, nullptr);
 	vkDestroyInstance(this->instance, nullptr);
